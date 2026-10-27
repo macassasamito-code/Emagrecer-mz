@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -7,7 +8,7 @@ import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 
 dotenv.config();
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const MEAL_SCAN_PROMPT =
   'Identifique os alimentos deste prato moçambicano, estime calorias, proteínas, carboidratos e gorduras, e dê uma dica rápida para quem quer emagrecer.';
 
@@ -262,7 +263,14 @@ Responda de forma concisa (máximo 3 parágrafos curtos ou tópicos diretos), ci
     }
   });
 
-  if (process.env.NODE_ENV !== 'production') {
+  const distPath = path.resolve(process.cwd(), 'dist');
+  const hasDist = fs.existsSync(path.join(distPath, 'index.html'));
+  const isProduction =
+    process.env.NODE_ENV === 'production' ||
+    Boolean(process.env.K_SERVICE) ||
+    (hasDist && process.env.DISABLE_HMR !== 'true');
+
+  if (!isProduction) {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
@@ -304,7 +312,6 @@ Responda de forma concisa (máximo 3 parágrafos curtos ou tópicos diretos), ci
 
     app.use(vite.middlewares);
   } else {
-    const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
