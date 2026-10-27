@@ -1,0 +1,6 @@
+{
+  "name": "CorpoFit MZ — Emagrecimento Consciente & Tonificação",
+  "description": "Plataforma PWA moçambicana de nutrição adaptada com alimentos locais, treinos em casa, Coach Fit IA e gestão de assinaturas via M-Pesa e e-Mola.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
